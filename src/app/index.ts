@@ -1,39 +1,35 @@
 import express from "express";
 import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from "@apollo/server/express4";
-// import cors from "cors";
+
+import { User } from './user'
 
 export async function initServer() {
   const app = express();
-  
+
   app.use(express.json());
-  
-  
-  // 3. Initialize and start the Apollo server
+
+
   const graphqlServer = new ApolloServer({
     typeDefs: `
+      ${User.types}
       type Query {
-        sayHello: String
-        sayHelloToMe(name: String!): String
+        ${User.queries}
       }
     `,
     resolvers: {
       Query: {
-        sayHello: () => `Hello from graphql server`,
-        sayHelloToMe: (parent: any, {name}: {name: string}) => {
-          return `Hey ${name}`
-        }
+        ...User.resolvers.queries,
       }
     },
-    introspection: true
   });
   await graphqlServer.start();
-  
+
   app.use(
     "/graphql",
     //@ts-ignore
     expressMiddleware(graphqlServer)
   );
-  
+
   return app;
 }
