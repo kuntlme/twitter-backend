@@ -1,10 +1,15 @@
 import jwt from "jsonwebtoken";
-import { prismaClient } from "../clients/db";
+import { JWTUser } from "../interfaces";
 
-export async function generateTokenForUser(userId: string){
-    const payload = {
+export function generateTokenForUser(userId: string){
+    const payload: JWTUser = {
         id: userId
     }
     const token = jwt.sign(payload, "secret");
     return token;
+}
+
+export function decodeTokenForUser(token: string){
+    const decodedToken = token.split(" ")[1];
+    return jwt.verify(decodedToken, "secret") as JWTUser;
 }
