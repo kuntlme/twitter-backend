@@ -3,10 +3,12 @@ import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from "@apollo/server/express4";
 
 import { User } from './user'
+import cors from "cors" 
 
 export async function initServer() {
   const app = express();
 
+  app.use(cors())
   app.use(express.json());
 
 

@@ -14,7 +14,7 @@ interface GoogleTokenResult {
     name?: string;
     picture?: string;
     family_name: string;
-    giver_name: string;
+    given_name: string;
     iat?: string;
     exp?: string; 
     jit?: string; 
@@ -29,25 +29,32 @@ const queries = {
 
         const data = jwt.decode(token) as GoogleTokenResult;
 
+        console.log(data)
+
         let user = await prismaClient.user.findUnique({
             where: {
                 email: data.email
             }
         })
 
+        console.log(user)
+
         if (!user) {
+            console.error("enter")
             user = await prismaClient.user.create({
                 data: {
                     email: data.email,
-                    firstName: data.giver_name,
+                    firstName: data.given_name,
                     lastName: data.family_name,
                     profileImageURL: data.picture
                 }
             })
+
+            console.log(user)
         }
 
-        // const userToken = await generateTokenForUser(user.id) as string;
-        return "token";
+        const userToken = await generateTokenForUser(user.id) as string;
+        return userToken;
     }
 
 }
