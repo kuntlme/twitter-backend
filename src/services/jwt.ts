@@ -10,6 +10,11 @@ export function generateTokenForUser(userId: string){
 }
 
 export function decodeTokenForUser(token: string){
-    const decodedToken = token.split(" ")[1];
-    return jwt.verify(decodedToken, "secret") as JWTUser;
+    try{
+        const decodedToken = token.split(" ")[1];
+        return jwt.verify(decodedToken, "secret") as JWTUser;
+    }catch(err){
+        return null;
+    }
+
 }
