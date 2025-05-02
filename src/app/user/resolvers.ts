@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken"
 import { prismaClient } from "../../clients/db";
 import { generateTokenForUser } from "../../services/jwt";
 import { GraphqlContext } from "../../interfaces";
+import { User } from "@prisma/client";
 
 interface GoogleTokenResult {
     iss?: string;
@@ -17,10 +18,10 @@ interface GoogleTokenResult {
     family_name: string;
     given_name: string;
     iat?: string;
-    exp?: string; 
-    jit?: string; 
-    alg?: string; 
-    typ?: string; 
+    exp?: string;
+    jit?: string;
+    alg?: string;
+    typ?: string;
 }
 const queries = {
     verifyGoogleToken: async (parent: any, { token }: { token: string }) => {
@@ -59,11 +60,17 @@ const queries = {
     },
     getCurrentUser: async (parent: any, args: any, ctx: GraphqlContext) => {
         const id = ctx.user?.id;
-        if(!id) return null;
-        const user = await prismaClient.user.findUnique({where: {id: id}});
+        if (!id) return null;
+        const user = await prismaClient.user.findUnique({ where: { id: id } });
         return user;
     }
 
 }
 
-export const resolvers = { queries }
+const extraResolvers = {
+    User: {
+        tweets: (parent: User) => prismaClient.tweet.findMany({ where: { author: { id: parent.id } } })
+    }
+}
+
+export const resolvers = { queries, extraResolvers }
